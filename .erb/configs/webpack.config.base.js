@@ -6,6 +6,8 @@ import path from 'path';
 import webpack from 'webpack';
 import { dependencies as externals } from '../../src/package.json';
 
+const { getThemeVariables } = require('antd/dist/theme');
+
 export default {
   externals: [...Object.keys(externals || {})],
 
@@ -30,6 +32,10 @@ export default {
               lessOptions: {
                 javascriptEnabled: true,
                 // customize theme
+                /* modifyVars: getThemeVariables({
+                  dark: true,
+                  compact: true,
+                }), */
               },
             },
           },

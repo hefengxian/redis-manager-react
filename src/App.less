@@ -3,6 +3,9 @@
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
 
+// @import '~antd/dist/antd.dark.less'; // 引入官方提供的暗色 less 样式入口文件
+// @import '~antd/dist/antd.compact.less'; // 引入官方提供的紧凑 less 样式入口文件
+
 body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, form, fieldset, legend, input, textarea, p, blockquote, th, td, hr, button, article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
   margin: 0;
   padding: 0;
@@ -12,63 +15,18 @@ html, body {
   font-size: 12px;
 }
 
+* {
+  animation-duration: 0s !important;
+}
+
 .flex-vertical {
   display: flex;
   flex-direction: column;
 }
 
-.main {
-  height: 100vh;
-  overflow: hidden;
+.flex-horizontal {
   display: flex;
-  font-size: 12px;
-
-  & .content {
-    flex: 1;
-    width: 100%;
-
-    & .links {
-      width: 250px;
-      background-color: #f9f9f9;
-      padding: 16px;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    & .toolbar {
-
-    }
-  }
-
-  & .nav {
-    background: #2a292a;
-    padding: 16px 0;
-    width: 55px;
-    text-align: center;
-    .flex-vertical;
-
-    & a {
-      color: #ccc;
-    }
-
-    & ul li {
-      list-style: none;
-      padding-top: 16px;
-      font-size: 24px;
-    }
-    & .nav-top {
-      flex: 1;
-      & li:first-child {
-        padding-top: 0;
-      }
-    }
-    & .nav-bottom {
-      flex: 1;
-      .flex-vertical;
-      justify-content: flex-end;
-    }
-  }
+  flex-direction: row;
 }
 
 @muted-text-color: #999;
@@ -81,6 +39,164 @@ html, body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+#root {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  font-size: 12px;
+  // background-color: #1e1e1e;
+  // background-color: #f3f3f3;
+
+  .content {
+    flex: 1;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+
+    & .list {
+      width: 250px;
+      background-color: #f9f9f9;
+      padding: 16px;
+      height: 100vh;
+      .flex-vertical;
+
+      & .search-box {
+        margin: 0 -16px;
+        padding: 0 16px 16px 16px;
+        border-bottom: 1px #dddee1 solid;
+        .flex-horizontal;
+
+        & .search {
+          flex: 1;
+          margin-right: 8px;
+        }
+      }
+
+      & .actions {
+        margin: 0 -16px;
+        padding: 0 16px;
+        border-bottom: 1px #dddee1 solid;
+        .flex-horizontal;
+
+        &-left {
+          flex: 1;
+          .flex-horizontal;
+        }
+
+        &-right {
+          flex: 1;
+          .flex-horizontal;
+          justify-content: flex-end;
+        }
+      }
+
+      & .items {
+        margin: 0 -16px;
+        overflow: auto;
+        flex: 1;
+
+        & .active {
+          background-color: #c7c6c6;
+        }
+
+        & .item {
+          padding: 8px 16px;
+          display: flex;
+          cursor: pointer;
+          flex-direction: column;
+
+          &:hover {
+            background-color: #d7d6d6;
+          }
+
+          & .title-box {
+            flex: 1;
+            display: flex;
+            // padding-bottom: 8px;
+
+            // 待办标题
+            & .title {
+              flex: 1;
+              color: #2D8cF0;
+              font-size: 14px;
+              font-weight: bold;
+              .lineEllipsis(1);
+            }
+
+            // 创建时间
+            & .time {
+              padding-left: 16px;
+              color: @muted-text-color;
+              text-align: right;
+              .lineEllipsis(1);
+            }
+          }
+
+          // 描述
+          & .desc {
+            flex: 1;
+            word-break: break-all;
+            color: @muted-text-color;
+            .lineEllipsis(2);
+          }
+        }
+      }
+    }
+
+    & .detail {
+      flex: 1;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+  }
+
+  & .nav {
+    background: #333333;
+    padding: 16px 0;
+    width: 55px;
+    text-align: center;
+    .flex-vertical;
+
+    & a {
+      color: #ccc;
+    }
+
+    & ul li {
+      list-style: none;
+      padding-top: 8px;
+      font-size: 24px;
+
+      & a {
+        display: block;
+        &.active {
+          border-left: 2px solid #ffffff;
+          background-color: #444444;
+          color: #ffffff;
+        }
+      }
+    }
+
+    & .nav-top {
+      flex: 1;
+
+      & li:first-child {
+        padding-top: 0;
+      }
+    }
+
+    & .nav-bottom {
+      flex: 1;
+      .flex-vertical;
+      justify-content: flex-end;
+    }
+  }
+}
+
+/*
+@muted-text-color: #999;
 
 .base-font {
   font-size: 12px;
@@ -255,3 +371,5 @@ html, body {
     list-style: decimal !important;
   }
 }
+*/
+
