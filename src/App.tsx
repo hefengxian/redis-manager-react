@@ -10,8 +10,9 @@ import {
   EllipsisOutlined,
   DatabaseOutlined,
 } from '@ant-design/icons';
-import { Button, Input, Tabs } from 'antd';
+import { Button, Input, Tabs, Avatar, Card } from 'antd';
 import './App.less';
+import logo from '../assets/logo.svg';
 
 function Main() {
   const list = [
@@ -23,7 +24,7 @@ function Main() {
     },
   ];
   // eslint-disable-next-line no-plusplus
-  for (let i = 0; i <= 50; i++) {
+  for (let i = 0; i <= 2; i++) {
     list.push({
       key: String(100 + i),
       title: `192.168.0.${100 + i}:6379`,
@@ -62,17 +63,24 @@ function Main() {
       <div className="detail">
         <Tabs
           size="small"
+          hideAdd
+          className="tabs"
           type="editable-card"
-          tabBarStyle={{ fontSize: '12px' }}
           defaultActiveKey="1"
         >
-          {[...Array.from({ length: 30 }, (_v, i) => i)].map((i) => (
+          {[...Array.from({ length: 20 }, (_v, i) => i)].map((i) => (
             <Tabs.TabPane
               tab={`Long title tab-${i}`}
               key={i}
               disabled={i === 28}
             >
-              Content of tab {i}
+              {[...Array.from({length: 2 * (i+1)}, (_v, i) => i)].map((j) => (
+                <Card key={j} size="small" title={`Default size card ${i}-${j}`}>
+                  <p>Card content</p>
+                  <p>Card content</p>
+                  <p>Card content</p>
+                </Card>
+              ))}
             </Tabs.TabPane>
           ))}
         </Tabs>
@@ -117,6 +125,9 @@ export default function App() {
     <>
       <div className="nav">
         <ul className="nav-top">
+          <li className="logo">
+            <Avatar shape="square" src={logo} />
+          </li>
           <li>
             <NavLink to="/main">
               <DatabaseOutlined />

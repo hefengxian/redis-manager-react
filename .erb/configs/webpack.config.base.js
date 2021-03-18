@@ -32,10 +32,10 @@ export default {
               lessOptions: {
                 javascriptEnabled: true,
                 // customize theme
-                /* modifyVars: getThemeVariables({
-                  dark: true,
+                modifyVars: getThemeVariables({
+                  // dark: true,
                   compact: true,
-                }), */
+                }),
               },
             },
           },
