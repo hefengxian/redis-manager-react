@@ -9,6 +9,9 @@ import {
   SyncOutlined,
   EllipsisOutlined,
   DatabaseOutlined,
+  CloudServerOutlined,
+  DashboardOutlined,
+  ProjectOutlined,
 } from '@ant-design/icons';
 import { Button, Input, Tabs, Avatar, Card } from 'antd';
 import './App.less';
@@ -74,13 +77,56 @@ function Main() {
               key={i}
               disabled={i === 28}
             >
-              {[...Array.from({length: 2 * (i+1)}, (_v, i) => i)].map((j) => (
-                <Card key={j} size="small" title={`Default size card ${i}-${j}`}>
-                  <p>Card content</p>
-                  <p>Card content</p>
-                  <p>Card content</p>
+              <div className="home-actions">
+                <Button
+                  size="small"
+                  icon={<SyncOutlined />}>Refresh</Button>
+              </div>
+
+              <div className="board">
+                <Card
+                  className="board-item"
+                  size="small"
+                  title={
+                    <div className="card-title">
+                      <DashboardOutlined className="icon" />
+                      <span>Stats</span>
+                    </div>
+                  }
+                >
+                  <p>Connected Clients: 1</p>
+                  <p>Total Connections: 1</p>
+                  <p>Total Commands: 3</p>
                 </Card>
-              ))}
+                <Card
+                  className="board-item"
+                  size="small"
+                  title={
+                    <div className="card-title">
+                      <ProjectOutlined className="icon" />
+                      <span>Memory</span>
+                    </div>
+                  }
+                >
+                  <p>Used Memory: 839.17K</p>
+                  <p>Used Memory Peak: 839.17K</p>
+                  <p>Used Memory Lua: 41K</p>
+                </Card>
+                <Card
+                  className="board-item"
+                  size="small"
+                  title={
+                    <div className="card-title">
+                      <CloudServerOutlined className="icon" />
+                      <span>Server</span>
+                    </div>
+                  }
+                >
+                  <p>Redis Version: 5.0.3</p>
+                  <p>OS: Linux4.19.0-14-amd64x86_64</p>
+                  <p>Process ID: 423</p>
+                </Card>
+              </div>
             </Tabs.TabPane>
           ))}
         </Tabs>

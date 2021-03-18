@@ -153,6 +153,34 @@ html, body {
       flex-direction: column;
       overflow: hidden;
 
+      & .home-actions {
+        .flex-horizontal;
+        justify-content: flex-end;
+        margin-bottom: 16px;
+      }
+
+      & .board {
+        .flex-horizontal;
+
+        &-item {
+          flex: 1;
+          margin-left: 16px;
+          &:first-child {
+            margin: 0;
+          }
+        }
+      }
+
+      & .card-title {
+        .flex-horizontal;
+        align-content: center;
+        & .icon {
+          font-size: 20px;
+          margin-right: 8px;
+        }
+
+      }
+
       & .tabs {
         .flex-vertical;
         overflow: hidden;

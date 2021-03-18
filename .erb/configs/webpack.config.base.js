@@ -32,10 +32,14 @@ export default {
               lessOptions: {
                 javascriptEnabled: true,
                 // customize theme
-                modifyVars: getThemeVariables({
-                  // dark: true,
-                  compact: true,
-                }),
+                modifyVars: {
+                  ...getThemeVariables({
+                    // dark: true,
+                    compact: true,
+                  }),
+                  'primary-color': '#d82f27',
+                  'link-color': '#d82f27',
+                },
               },
             },
           },
