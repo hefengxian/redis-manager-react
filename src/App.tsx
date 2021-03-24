@@ -23,9 +23,12 @@ import {
   Form,
   Checkbox,
   InputNumber,
+  message,
 } from 'antd';
 import './App.less';
 import logo from '../assets/logo.svg';
+import store from './storage';
+import Redis from 'ioredis';
 
 function Main() {
   const list = [
@@ -46,22 +49,23 @@ function Main() {
     });
   }
 
+  const storedConnections = store.getConnections();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [connections, setConnections] = useState([]);
+  const [connections, setConnections] = useState(storedConnections);
   const [tabs, setTabs] = useState([]);
   const [form] = Form.useForm();
 
   const defaultForm = {
-    host: '',
+    host: '192.168.0.211',
     port: 6379,
-    auth: '',
+    password: '',
     separator: ':',
-    name: '',
+    name: 'Redis 211',
   };
 
   function handleOk() {
     // 获取到表单信息
-    let connection = form.getFieldsValue();
+    const connection = form.getFieldsValue();
     // 预处理
     if (connection.host.trim().length === 0) {
       connection.host = '127.0.0.1';
@@ -69,15 +73,38 @@ function Main() {
     if (connection.separator.trim().length === 0) {
       connection.separator = ':';
     }
+    const key = `${connection.host}:${connection.port}`;
     if (connection.name.trim().length === 0) {
-      connection.name = `${connection.host}:${connection.port}`;
+      connection.name = key;
     }
-    // 获取 Redis 连接
-    connections.push(connection);
-    setConnections(connections);
-    // 加入本地永久存储
-    localStorage.setItem('CONNECTIONS', JSON.stringify(connections));
-    // 向 tab list 加一个 tab（用对象？），检查是否存在
+    connection.key = key;
+
+    let isExist = false;
+    storedConnections.forEach((v) => {
+      if (v.key === key) {
+        isExist = true;
+      }
+    });
+
+    if (!isExist) {
+      // 连接信息
+      storedConnections.push(connection);
+      // 加入本地永久存储
+      store.storeConnections(storedConnections);
+      // 获取 Redis 连接
+      const client = new Redis(connection);
+      connection.client = client;
+      connections.push(connection);
+      setConnections(connections);
+
+      // 向 tab list 加一个 tab（用对象？），检查是否存在
+      tabs.push({ key, title: `${connection.name} - Dashboard`, client });
+      setTabs(tabs)
+    } else {
+      message.warn('you already add this one');
+      return;
+    }
+
     // 并且打开那个 Tab
     //
     // you
@@ -88,6 +115,29 @@ function Main() {
     setIsModalVisible(false);
   }
 
+  function handleConnectionClick(e, conn) {
+    // console.log(conn)
+    if (!conn.client) {
+      conn.client = new Redis(conn)
+    }
+    const key = `${conn.host}:${conn.port}`
+
+    let tabExists = false;
+    tabs.forEach(t => {
+      if (t.key === key) {
+        tabExists = true
+      }
+    });
+    if (!tabExists) {
+      tabs.push({
+        key,
+        client: conn.client,
+        title: `${conn.name} - Dashboard`,
+      })
+      setTabs([...tabs]);
+    }
+  }
+
   const layout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 18 },
@@ -95,8 +145,6 @@ function Main() {
   const tailLayout = {
     wrapperCol: { offset: 4, span: 20 },
   };
-
-
 
   return (
     <>
@@ -120,12 +168,18 @@ function Main() {
             </div>
           </div>
           <ul className="items">
-            {list.map((item) => (
-              <li className="item" key={item.key}>
+            {connections.map((conn) => (
+              <li
+                onClick={(e) => {
+                  handleConnectionClick(e, conn);
+                }}
+                className="item"
+                key={conn.key}
+              >
                 <div className="title-box">
-                  <div className="title">{item.title}</div>
+                  <div className="title">{conn.name}</div>
                 </div>
-                <div className="desc">{item.desc}</div>
+                <div className="desc">{conn.name}</div>
               </li>
             ))}
           </ul>
@@ -138,11 +192,10 @@ function Main() {
             type="editable-card"
             defaultActiveKey="1"
           >
-            {[...Array.from({ length: 20 }, (_v, i) => i)].map((i) => (
+            {tabs.map((tab) => (
               <Tabs.TabPane
-                tab={`Long title tab-${i}`}
-                key={i}
-                disabled={i === 28}
+                tab={tab.title}
+                key={tab.key}
               >
                 <div className="home-actions">
                   <Button size="small" icon={<SyncOutlined />}>
@@ -223,7 +276,7 @@ function Main() {
           <Form.Item label="Port" name="port">
             <InputNumber placeholder="6379" />
           </Form.Item>
-          <Form.Item label="Auth" name="auth">
+          <Form.Item label="Password" name="password">
             <Input.Password />
           </Form.Item>
           <Form.Item label="Separator" name="separator">
@@ -232,7 +285,7 @@ function Main() {
           <Form.Item label="Name" name="name">
             <Input placeholder="" />
           </Form.Item>
-          <Form.Item { ...tailLayout } name="remember" valuePropName="checked">
+          <Form.Item { ...tailLayout }>
             <Checkbox>SSH Tunnel</Checkbox>
             <Checkbox>SSH</Checkbox>
             <Checkbox>Cluster</Checkbox>
