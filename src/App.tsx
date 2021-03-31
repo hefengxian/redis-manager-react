@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Switch, Route, NavLink } from 'react-router-dom';
+import React, { useState } from "react";
+import { Switch, Route, NavLink } from "react-router-dom";
 import {
   QuestionCircleOutlined,
   SettingOutlined,
@@ -12,7 +12,14 @@ import {
   CloudServerOutlined,
   DashboardOutlined,
   ProjectOutlined,
-} from '@ant-design/icons';
+  ApiOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  SaveOutlined,
+  WindowsOutlined,
+  AppleOutlined,
+  CopyOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Input,
@@ -24,20 +31,24 @@ import {
   Checkbox,
   InputNumber,
   message,
-} from 'antd';
-import './App.less';
-import logo from '../assets/logo.svg';
-import store from './storage';
-import Redis from 'ioredis';
+  Menu,
+  Dropdown,
+  Badge
+} from "antd";
+import "./App.less";
+import logo from "../assets/logo.svg";
+import store from "./storage";
+import { get, save, connect } from "./ConnectionManager";
+
 
 function Main() {
   const list = [
     {
-      key: 'xxx',
+      key: "xxx",
       title: `192.168.0.xxx:6379`,
-      desc: 'this is a description of 192.168.0.xxx:6379',
-      active: true,
-    },
+      desc: "this is a description of 192.168.0.xxx:6379",
+      active: true
+    }
   ];
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i <= 2; i++) {
@@ -45,22 +56,23 @@ function Main() {
       key: String(100 + i),
       title: `192.168.0.${100 + i}:6379`,
       desc: `this is a description of 192.168.0.${100 + i}:6379`,
-      active: false,
+      active: false
     });
   }
 
   const storedConnections = store.getConnections();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selected, setSelected] = useState(null);
   const [connections, setConnections] = useState(storedConnections);
   const [tabs, setTabs] = useState([]);
   const [form] = Form.useForm();
 
   const defaultForm = {
-    host: '192.168.0.211',
+    host: "192.168.1.40",
     port: 6379,
-    password: '',
-    separator: ':',
-    name: 'Redis 211',
+    password: "",
+    separator: ":",
+    name: "Redis 211"
   };
 
   function handleOk() {
@@ -68,10 +80,10 @@ function Main() {
     const connection = form.getFieldsValue();
     // 预处理
     if (connection.host.trim().length === 0) {
-      connection.host = '127.0.0.1';
+      connection.host = "127.0.0.1";
     }
     if (connection.separator.trim().length === 0) {
-      connection.separator = ':';
+      connection.separator = ":";
     }
     const key = `${connection.host}:${connection.port}`;
     if (connection.name.trim().length === 0) {
@@ -92,16 +104,17 @@ function Main() {
       // 加入本地永久存储
       store.storeConnections(storedConnections);
       // 获取 Redis 连接
-      const client = new Redis(connection);
-      connection.client = client;
+      const client = connect(connection);
+      save(key, client);
+      // connection.client = client;
       connections.push(connection);
       setConnections(connections);
 
       // 向 tab list 加一个 tab（用对象？），检查是否存在
       tabs.push({ key, title: `${connection.name} - Dashboard`, client });
-      setTabs(tabs)
+      setTabs(tabs);
     } else {
-      message.warn('you already add this one');
+      message.warn("you already add this one");
       return;
     }
 
@@ -118,40 +131,117 @@ function Main() {
   function handleConnectionClick(e, conn) {
     // console.log(conn)
     if (!conn.client) {
-      conn.client = new Redis(conn)
+      // conn.client = new Redis(conn);
     }
-    const key = `${conn.host}:${conn.port}`
+    const key = `${conn.host}:${conn.port}`;
+    setSelected(conn);
 
     let tabExists = false;
     tabs.forEach(t => {
       if (t.key === key) {
-        tabExists = true
+        tabExists = true;
       }
     });
     if (!tabExists) {
       tabs.push({
         key,
         client: conn.client,
-        title: `${conn.name} - Dashboard`,
-      })
+        title: `${conn.name} - Dashboard`
+      });
       setTabs([...tabs]);
     }
   }
 
   const layout = {
     labelCol: { span: 4 },
-    wrapperCol: { span: 18 },
+    wrapperCol: { span: 18 }
   };
   const tailLayout = {
-    wrapperCol: { offset: 4, span: 20 },
+    wrapperCol: { offset: 4, span: 20 }
   };
+
+  const menuItems = [
+    {
+      key: "close",
+      icon: <ApiOutlined />,
+      text: "Close connection",
+      onClick: () => {
+        message.warning('TODO Close connection')
+      }
+    },
+    {
+      key: "edit",
+      icon: <EditOutlined />,
+      text: "Edit connection",
+      onClick: () => {
+        message.warning('TODO Edit connection')
+      }
+    },
+    {
+      key: "delete",
+      icon: <DeleteOutlined />,
+      text: "Delete connection",
+      onClick: () => {
+        Modal.confirm({
+          autoFocusButton: "cancel",
+          content: "Confirm to delete this connection?",
+          onOk: () => {
+            let conn = connections.filter((conn: null) => conn != selected);
+            setConnections(conn);
+            store.storeConnections(conn);
+            setSelected(null);
+          }
+        });
+      }
+    },
+    {
+      key: "flush",
+      icon: <SaveOutlined />,
+      text: "Flush DB",
+      onClick: () => {
+        message.warning('TODO Flush DB')
+      }
+    }
+  ];
+
+  const menu = (
+    <Menu>
+      {menuItems.map(item => (
+        <Menu.Item
+          key={item.key}
+          icon={item.icon}
+          onClick={item.onClick}
+        >{item.text}</Menu.Item>
+      ))}
+    </Menu>
+  );
+
+  const goRedisHome = () => {
+    alert("TODO goRedisHome");
+  };
+  const goRedisTerminal = () => {
+    alert("TODO goRedisTerminal");
+  };
+  const refreshConnection = () => {
+    alert("TODO refreshConnection");
+  };
+  const duplicateConnection = () => {
+    alert("TODO duplicateConnection");
+  }
+  const onFilter = () => {
+    message.warning('TODO onFilter')
+  }
 
   return (
     <>
       <div className="content">
         <div className="list">
           <div className="search-box">
-            <Input.Search size="small" className="search" />
+            <Input.Search
+              allowClear
+              onSearch={onFilter}
+              size="small"
+              className="search" />
             <Button
               onClick={() => setIsModalVisible(true)}
               size="small"
@@ -159,27 +249,61 @@ function Main() {
             />
           </div>
           <div className="actions">
-            <div className="actions-left" />
+            <div className="actions-left">
+              <Button
+                onClick={duplicateConnection}
+                title="Duplicate"
+                type="text"
+                size="small"
+                icon={<CopyOutlined />} />
+            </div>
             <div className="actions-right">
-              <Button type="text" size="small" icon={<HomeOutlined />} />
-              <Button type="text" size="small" icon={<CodeOutlined />} />
-              <Button type="text" size="small" icon={<SyncOutlined />} />
-              <Button type="text" size="small" icon={<EllipsisOutlined />} />
+              <Button
+                disabled={!selected}
+                onClick={goRedisHome}
+                type="text"
+                size="small"
+                icon={<HomeOutlined />} />
+              <Button
+                disabled={!selected}
+                onClick={goRedisTerminal}
+                type="text"
+                size="small"
+                icon={<CodeOutlined />} />
+              <Button
+                disabled={!selected}
+                onClick={refreshConnection}
+                type="text"
+                size="small"
+                icon={<SyncOutlined />} />
+              <Dropdown
+                trigger={["click"]}
+                overlay={menu}
+                disabled={!selected}>
+                <Button type="text" size="small" icon={<EllipsisOutlined />} />
+              </Dropdown>
+              {/*<Button disabled={!selected} type="text" size="small" icon={<EllipsisOutlined />} />*/}
             </div>
           </div>
           <ul className="items">
             {connections.map((conn) => (
               <li
-                onClick={(e) => {
+                onDoubleClick={(e) => {
                   handleConnectionClick(e, conn);
                 }}
-                className="item"
+                onClick={() => {
+                  setSelected(conn);
+                }}
+                className={(selected === conn) ? "item active" : "item"}
                 key={conn.key}
               >
                 <div className="title-box">
+                  <Badge color="grey" />
+                  {/*<Avatar icon={<WindowsOutlined />} />*/}
                   <div className="title">{conn.name}</div>
+                  {/*<WindowsOutlined />*/}
+                  <AppleOutlined />
                 </div>
-                <div className="desc">{conn.name}</div>
               </li>
             ))}
           </ul>
@@ -285,7 +409,7 @@ function Main() {
           <Form.Item label="Name" name="name">
             <Input placeholder="" />
           </Form.Item>
-          <Form.Item { ...tailLayout }>
+          <Form.Item {...tailLayout}>
             <Checkbox>SSH Tunnel</Checkbox>
             <Checkbox>SSH</Checkbox>
             <Checkbox>Cluster</Checkbox>
@@ -301,9 +425,9 @@ function Setting() {
     <div
       style={{
         flex: 1,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center"
       }}
     >
       Settings
@@ -314,18 +438,18 @@ function Setting() {
 export default function App() {
   const routers = [
     {
-      path: '/main',
-      page: <Main />,
+      path: "/main",
+      page: <Main />
     },
     {
-      path: '/setting',
-      page: <Setting />,
+      path: "/setting",
+      page: <Setting />
     },
     {
-      path: '/',
+      path: "/",
       exact: true,
-      page: <Main />,
-    },
+      page: <Main />
+    }
   ];
 
   return (

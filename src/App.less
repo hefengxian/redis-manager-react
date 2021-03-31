@@ -98,7 +98,7 @@ html, body {
         flex: 1;
 
         & .active {
-          background-color: #c7c6c6;
+          background-color: #d7d6d6;
         }
 
         & .item {
@@ -106,7 +106,7 @@ html, body {
           display: flex;
           cursor: pointer;
           flex-direction: column;
-          border-bottom: 1px solid #fff;
+          // border-bottom: 1px solid #fff;
 
           &:hover {
             background-color: #d7d6d6;
@@ -115,12 +115,14 @@ html, body {
           & .title-box {
             flex: 1;
             display: flex;
-            // padding-bottom: 8px;
+            .flex-horizontal;
+            align-items: center;
 
             // 待办标题
             & .title {
               flex: 1;
               color: #2D8cF0;
+              // padding-left: 8px;
               font-size: 14px;
               // font-weight: bold;
               .lineEllipsis(1);
