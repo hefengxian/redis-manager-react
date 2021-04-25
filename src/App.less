@@ -5,6 +5,7 @@
 
 // @import '~antd/dist/antd.dark.less'; // 引入官方提供的暗色 less 样式入口文件
 // @import '~antd/dist/antd.compact.less'; // 引入官方提供的紧凑 less 样式入口文件
+@import "~antd/lib/style/themes/default";
 
 body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, form, fieldset, legend, input, textarea, p, blockquote, th, td, hr, button, article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
   margin: 0;
@@ -13,6 +14,8 @@ body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, form, fieldset, legen
 
 html, body {
   font-size: 12px;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /** {
@@ -57,7 +60,7 @@ html, body {
 
     & .list {
       width: 250px;
-      background-color: #f9f9f9;
+      background-color: #f0f0f0;
       padding: 16px;
       height: 100vh;
       .flex-vertical;
@@ -76,7 +79,7 @@ html, body {
 
       & .actions {
         margin: 0 -16px;
-        padding: 0 16px;
+        // padding: 0 16px;
         border-bottom: 1px #dddee1 solid;
         .flex-horizontal;
 
@@ -98,18 +101,47 @@ html, body {
         flex: 1;
 
         & .active {
-          background-color: #d7d6d6;
+          background-color: @tree-directory-selected-bg;
+          color: @tree-directory-selected-color;
         }
 
+        & .key-tree {
+          background-color: #fff;
+          & .key-tools {
+            .flex-horizontal;
+            padding: 4px 0;
+
+            & .key-tools-left {
+              flex: 1
+            }
+            & .key-tools-right {
+              flex: 1;
+              .flex-horizontal;
+              // justify-content: flex-end;
+            }
+          }
+
+          // override ant-tree background color
+          & .ant-tree {
+            background-color: transparent;
+            & .ant-tree-node-content-wrapper {
+              padding: 0;
+            }
+          }
+        }
+
+
+
         & .item {
-          padding: 8px 16px;
+          padding: 8px 0;
           display: flex;
           cursor: pointer;
           flex-direction: column;
           // border-bottom: 1px solid #fff;
 
           &:hover {
-            background-color: #d7d6d6;
+            background-color: @primary-3;
+            color: @tree-directory-selected-color;
           }
 
           & .title-box {
@@ -118,11 +150,20 @@ html, body {
             .flex-horizontal;
             align-items: center;
 
+            & .switcher {
+              box-sizing: border-box;
+              width: 20px;
+              line-height: 20px;
+              text-align: center;
+              font-size: 10px;
+            }
+
             // 待办标题
             & .title {
+              user-select: none;
               flex: 1;
-              color: #2D8cF0;
-              // padding-left: 8px;
+              // color: #2D8cF0;
+              padding-left: 4px;
               font-size: 14px;
               // font-weight: bold;
               .lineEllipsis(1);
